@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang='ja'>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ヘルスケアアプリ</title>
+  <link rel="stylesheet" href="{% static 'health/css/reset.css' %}">
+  <link rel="stylesheet" href="{% static 'health/css/style.css' %}">
+  {% block extrajs %}{% endblock %}
+</head>
+
+<body>
+  <header class='nav'>
+    <h1>
+      <a href="{% url 'health:weight_list' %}" class='header-title'>ヘルスケアアプリ</a>
+    </h1>
+    <nav class="nav">
+      <ul class="main-nav ml-5">
+        <li class="ml-5">
+          <a href="{% url 'health:weight_list'%}">体重一覧</a>
+        </li>
+        <li class="ml-5">
+          <a href="{% url 'health:weight_create'%}">体重追加</a>
+        </li>
+        <li class="ml-5">
+          <a href="{% url 'health:month_dashboard' now_year now_month%}">月間支出</a>
+        </li>
+    </nav>
+  </header>
+
+  <div class='layout'>
+    <div class='container'>
+      <main>
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+</body>
+
+</html>

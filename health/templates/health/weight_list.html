@@ -1,0 +1,56 @@
+{% extends 'health/base.html' %}
+{% block content %}
+{% load health %}
+
+<form class="mt-2" id="search-form" action="" method="GET">
+  <div>
+    <label class="label mr-4">年月</label>
+    {{ search_form.year }}
+    {{ search_form.month }}
+  </div>
+  <button class="btn btn-info ml-4" type="submit">検索</button>
+</form>
+
+<table class="table mt-3">
+  <tr>
+    <th>日付</th>
+    <th>体重</th>
+    <th>体脂肪率</th>
+  </tr>
+  {% for weight in weight_list %}
+  <tr>
+    <td>{{ weight.date }}</td>
+    <td>{{ weight.weight }}</td>
+    <td>{{ weight.body_fat }}</td>
+    <td>
+      <td>
+        <div class="manage-btn-area">
+          <div class="update-btn-area">
+            <a class="btn btn-info" href="{% url 'health:weight_update' weight.pk %}">更新</a>
+          </div>
+          <div class="delete-btn-area">
+            <a class="btn btn-danger" href="{% url 'health:weight_delete' weight.pk %}">削除</a>
+          </div>
+        </div>
+      </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<div class="mt-5">
+  <!-- 1つ前 -->
+  {% if page_obj.has_previous %}
+  <a class="mr-2 prev" href="?{% url_replace request 'page' page_obj.previous_page_number %}" title="前ページへ">前へ</a>
+  {% endif %}
+
+  <!-- nページ目/トータルページ数 -->
+  <span style="color:#0d1a3c">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+  <!-- 1つ後 -->
+  {% if page_obj.has_next %}
+  <a class="ml-2 next" href="?{% url_replace request 'page' page_obj.next_page_number %}" title="次ページへ">次へ</a>
+  {% endif %}
+</div>
+
+{% endblock %}
+

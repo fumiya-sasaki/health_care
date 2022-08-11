@@ -1,0 +1,5 @@
+django
+django-pandas
+pandas
+plotly
+django-import-export
