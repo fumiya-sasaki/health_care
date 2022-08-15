@@ -37,6 +37,7 @@ class WeightCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['body_fat'].widget = forms.HiddenInput()
+        self.fields['bmi'].widget = forms.HiddenInput()
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form'
             field.widget.attrs['placeholder'] = field.label

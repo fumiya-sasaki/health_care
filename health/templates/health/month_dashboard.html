@@ -16,17 +16,45 @@
     <table class="table">
       <tr>
         <th>カテゴリ</th>
-        <th>体重</th>
+        <th>数値</th>
       </tr>
-      {% for key,value in table_set.items %}
       <tr>
-        <td>{{ key }}</td>
-        <td>{{ value}}</td>
+        <td>平均体重</td>
+        <td>{{ average }}Kg</td>
       </tr>
-      {% endfor %}
       <tr>
-        <td>Total</td>
-        <td>{{ total_payment }}</td>
+        <td>平均体脂肪</td>
+        <td>{{ ave_fat }}%</td>
+      </tr>
+      <tr>
+        <td>平均BMI</td>
+        <td>{{ ave_bmi }}%</td>
+      </tr>
+      <tr>
+        <td>理想体重</td>
+        <td>{{ appropriate }}Kg</td>
+      </tr>
+    </table>
+  </div>
+  <div class="right card">
+    <table class="table">
+      <tr>
+        <th>身長</th>
+        <th>性別</th>
+        <th>年齢</th>
+      </tr>
+      <tr>
+        <td>{{ height }}cm</td>
+        <td>{{ gender }}</td>
+        <td>{{ age }}歳</td>
+      </tr>
+    </table>
+    <table class="table mt-5">
+      <tr>
+        <th>現在基礎代謝</th>
+      </tr>
+      <tr>
+        <td>{{ leaving_work }}kcal</td>
       </tr>
     </table>
   </div>
@@ -34,6 +62,9 @@
 <div class="month-dash-bottom">
   <div class="hidden_toolbar">
     {{ plot_bar }}
+  </div>
+  <div class="hidden_toolbar">
+    {{ plot_line }}
   </div>
 </div>
 {% endautoescape %}

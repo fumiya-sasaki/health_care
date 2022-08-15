@@ -4,7 +4,9 @@ html {
   font-size: 62.5%;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -36,7 +38,7 @@ a {
 
 a:hover {
   opacity: .7;
-} 
+}
 
 /* --------------------------------
  * レイアウト・コンテナ
@@ -51,6 +53,12 @@ a:hover {
 main {
   padding: 36px 0;
   min-height: 40vh;
+}
+
+header.nav {
+  display: flex;
+  flex-direction: row;
+  padding: 5% 0 0 5%;
 }
 
 .container {
@@ -89,7 +97,7 @@ a.header-title {
   font-size: 2rem;
   margin: 0;
   padding: 0;
-  color:#888;
+  color: #888;
 }
 
 .main-nav {
@@ -225,7 +233,8 @@ a.header-title {
   background-color: #fafafa;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   text-align: center;
   width: 20%;
   padding: 15px 0;
@@ -249,7 +258,8 @@ a.header-title {
 /* --------------------------------
  * ボタン
  * -------------------------------- */
-.btn, a.btn {
+.btn,
+a.btn {
   font-size: 1.4rem;
   color: #333;
   -webkit-appearance: none;
@@ -265,11 +275,13 @@ a.header-title {
   cursor: pointer;
 }
 
-.btn:hover, a.btn:hover {
+.btn:hover,
+a.btn:hover {
   opacity: 0.5;
 }
 
-.btn-info, a.btn-info {
+.btn-info,
+a.btn-info {
   background-color: #39c0ed;
   color: #fff;
 }
@@ -278,11 +290,13 @@ a.header-title {
   color: #39c0ed;
 }
 
-.prev, .next {
+.prev,
+.next {
   font-weight: bold;
 }
 
-.btn-danger, a.btn-danger {
+.btn-danger,
+a.btn-danger {
   background-color: #f93154;
   color: #fff;
 }
@@ -307,6 +321,7 @@ a.header-title {
     margin-top: 5px;
   }
 }
+
 .month-pager {
   text-align: center;
   font-size: 1.6rem;
@@ -315,6 +330,7 @@ a.header-title {
 .month-dash-page-top {
   display: flex;
   flex-direction: row;
+  justify-content: space-evenly;
 }
 
 .left {
@@ -323,7 +339,7 @@ a.header-title {
 }
 
 .right {
-  width: 60%;
+  width: 50%;
   padding: 0 5%;
 }
 

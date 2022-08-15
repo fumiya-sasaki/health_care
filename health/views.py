@@ -3,7 +3,7 @@ from django.views import generic
 from health.forms import HealthSerchForm, WeightCreateForm
 from django.contrib import messages  # 追加
 from django.shortcuts import redirect  # 追加
-from health.models import Weight
+from health.models import Detail, Weight
 from django.urls import reverse_lazy
 import numpy as np
 import pandas as pd
@@ -54,21 +54,22 @@ class WeightCreate(generic.CreateView):
         return context
 
     def form_valid(self, form):
+        detail = Detail.objects.get(id=1)
         weight = form.cleaned_data['weight']
+        bmi = weight / ((detail.height / 100) ** 2)
         season_number = 0
-        currentDateTime = datetime.datetime.now()
-        date = currentDateTime.date()
+        date = form.cleaned_data['date']
         year = int(date.strftime("%Y"))
-        print(datetime.datetime(year, 4, 1))
-        if datetime.datetime(year, 4, 1).date() <= form.cleaned_data['date'] and datetime.datetime(year,10, 1).date() > form.cleaned_data['date']:
+        first = datetime.datetime(year, 4, 1).date()
+        latter = datetime.datetime(year, 10, 1).date()
+        if first <= date and latter > date:
             season_number = 1
-        body_fat = (3.02 + 0.461 * weight - 6.85 * season_number - 0.089 *
-            171 + 0.038 * 28 - 0.238) / weight * 100
-        Weight.objects.create(
-        date=form.cleaned_data['date'],
-        weight=weight,
-        body_fat=round(body_fat, 1)
-        )
+        # 体脂肪率＝(3.02 + 0.461×体重(kg) - 6.85×(男性１,女性0) - 0.089×身長(cm) + 0.038×年齢(歳) - 0.238×(冬0、夏1))÷体重×100
+        body_fat = (3.02 + 0.461 * weight - (6.85 * detail.gender) - 0.089 *
+                    detail.height + 0.038 * detail.age - (0.238 * season_number)) / weight * 100
+        form.instance.body_fat = round(body_fat, 1)
+        form.instance.bmi = round(bmi, 1)
+
         return super(WeightCreate, self).form_valid(form)
 
 
@@ -76,23 +77,33 @@ class WeightUpdate(generic.UpdateView):
     template_name = 'health/register.html'
     model = Weight
     form_class = WeightCreateForm
+    success_url = reverse_lazy('health:weight_list')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = '体重更新'
-        print('************', kwargs)
         return context
 
-    def get_success_url(self):
-        return reverse_lazy('health:weight_list')
-
     def form_valid(self, form):
+        detail = Detail.objects.get(id=1)
+        weight = form.cleaned_data['weight']
+        bmi = weight / ((detail.height / 100) ** 2)
+        season_number = 0
+        year = int(form.cleaned_data['date'].strftime("%Y"))
+        first = datetime.datetime(year, 4, 1).date()
+        latter = datetime.datetime(year, 10, 1).date()
+        if first <= form.cleaned_data['date'] and latter > form.cleaned_data['date']:
+            season_number = 1
+        # 体脂肪率＝(3.02 + 0.461×体重(kg) - 6.85×(男性１,女性0) - 0.089×身長(cm) + 0.038×年齢(歳) - 0.238×(冬0、夏1))÷体重×100
+        body_fat = (3.02 + 0.461 * weight - (6.85 * detail.gender) - 0.089 *
+                    detail.height + 0.038 * detail.age - (0.238 * season_number)) / weight * 100
+        form.instance.body_fat = round(body_fat, 1)
+        form.instance.bmi = round(bmi, 1)
+
         self.object = weight = form.save()
-        # messages.info(self.request,
-        #               f'支出を更新しました\n'
-        #               f'日付:{weight.date}\n'
-        #               f'カテゴリ:{weight.category}\n'
-        #               f'金額:{weight.price}円')
+        messages.info(self.request,
+                      f'体重を更新しました\n'
+                      f'日付:{weight.date}\n')
         return redirect(self.get_success_url())
 
 
@@ -106,20 +117,13 @@ class WeightDelete(generic.DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print('*******************', kwargs)
         context['page_title'] = '体重削除確認'
 
         return context
 
     def delete(self, request, *args, **kwargs):
-        self.object = weght = self.get_object()
-
-        weght.delete()
-        # messages.info(self.request,
-        #               f'支出を削除しました\n'
-        #               f'日付:{weght.date}\n'
-        #               f'カテゴリ:{weght.category}\n'
-        #               f'金額:{weght.price}円')
+        self.object = weight = self.get_object()
+        weight.delete()
         return redirect(self.get_success_url())
 
 
@@ -161,32 +165,61 @@ class MonthDashboard(generic.TemplateView):
         if not queryset:
             return context
 
+        detail = Detail.objects.get(id=1)
         df = read_frame(queryset,
-                        fieldnames=['date', 'weight', 'body_fat'])
+                        fieldnames=['date', 'weight', 'body_fat', 'bmi'])
 
         # グラフ作成クラスをインスタンス化
         gen = GraphGenerator()
 
-        # # pieチャートの素材を作成
-        # df_pie = pd.pivot_table(df, index='category', values='price', aggfunc=np.sum)
-        # pie_labels = list(df_pie.index.values)
-        # pie_values = [val[0] for val in df_pie.values]
-        # plot_pie = gen.month_pie(labels=pie_labels, values=pie_values)
-        # context['plot_pie'] = plot_pie
-
-        # # テーブルでのカテゴリと金額の表示用。
-        # # {カテゴリ:金額,カテゴリ:金額…}の辞書を作る
-        # context['table_set'] = df_pie.to_dict()['price']
+        season_number = 0
+        date = df['date'][len(df['date']) - 1]
+        first = datetime.datetime(year, 4, 1).date()
+        latter = datetime.datetime(year, 10, 1).date()
+        if first <= date and latter > date:
+            season_number = 1
 
         # # totalの数字を計算して渡す
-        context['total_payment'] = df['weight'].sum() / len(df['weight'])
+        context['average'] = round(
+            df['weight'].sum() / len(df['weight']), 1)
+
+        context['ave_fat'] = round(
+            df['body_fat'].sum() / len(df['body_fat']), 1)
+
+        context['ave_bmi'] = round(
+            df['bmi'].sum() / len(df['bmi']), 1)
+
+        context['appropriate'] = round((detail.height / 100) ** 2 * 22, 1)
+        context['height'] = detail.height
+        context['gender'] = '男性' if detail.gender == 1 else '女性'
+        context['age'] = detail.age
+        context['leaving_work'] = round(97.8 + 13.9 * df['weight'][len(
+            df['weight']) - 1] + 176.8 * detail.gender + 2.29 * detail.height - 0.97 * detail.age + 6.13 * season_number,1)
 
         # 日別の棒グラフの素材を渡す
-        df_bar = pd.pivot_table(
-            df, index='date', values='weight', aggfunc=np.sum)
-        dates = list(df_bar.index.values)
-        heights = [val[0] for val in df_bar.values]
-        plot_bar = gen.month_daily_bar(x_list=dates, y_list=heights)
+        df_weight = pd.pivot_table(
+            df, index='date', values='weight')
+        df_body_fat = pd.pivot_table(
+            df, index='date', values='body_fat')
+        df_bmi = pd.pivot_table(
+            df, index='date', values='bmi')
+        dates = list(df_weight.index.values)
+        weight_heights = [val[0] for val in df_weight.values]
+        body_fat_heights = [val[0] for val in df_body_fat.values]
+        bmi_heights = [val[0] for val in df_bmi.values]
+
+        plot_bar = gen.month_daily_bar(
+            x_weight=dates,
+            y_weight=weight_heights,
+        )
+
+        plot_line = gen.month_daily_line(
+            x_body_fat=dates,
+            y_body_fat=body_fat_heights,
+            x_bmi=dates,
+            y_bmi=bmi_heights
+        )
         context['plot_bar'] = plot_bar
+        context['plot_line'] = plot_line
 
         return context
