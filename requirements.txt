@@ -3,3 +3,4 @@ django-pandas
 pandas
 plotly
 django-import-export
+django-heroku==0.3.1
