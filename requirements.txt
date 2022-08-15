@@ -4,3 +4,4 @@ pandas
 plotly
 django-import-export
 django-heroku==0.3.1
+gunicorn==20.0.4
