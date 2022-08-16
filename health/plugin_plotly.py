@@ -22,6 +22,7 @@ class GraphGenerator:
                                      font=dict(size=22,
                                                color='grey'),
                                      y=0.88),
+                          margin=dict(  l=0, r=5),
                           xaxis=dict(title='日付（日）'),
                           yaxis=dict(title='体重（Kg）'),)
         fig.add_trace(go.Scatter(
@@ -46,7 +47,14 @@ class GraphGenerator:
         fig.update_layout(title=dict(text='<b>月間体脂肪/BMI推移',
                                      font=dict(size=22,
                                                color='grey'),
-                                     y=0.88),
+                                     y=0.9),
+                          legend=dict(xanchor='left',
+                                      yanchor='bottom',
+                                      x=0,
+                                      y=1,
+                                      orientation='h',
+                                      ),
+                          margin=dict(  l=0, r=5),
                           xaxis=dict(title='日付（日）'),
                           yaxis=dict(title='体脂肪/BMI（%）')
                           )

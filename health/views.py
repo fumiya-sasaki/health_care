@@ -1,4 +1,5 @@
 from django.views import generic
+from health import forms
 
 from health.forms import HealthSerchForm, WeightCreateForm
 from django.contrib import messages  # 追加
@@ -10,10 +11,22 @@ import pandas as pd
 import datetime
 from django_pandas.io import read_frame
 from .plugin_plotly import GraphGenerator
-# Create your views here.
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class WeightList(generic.ListView):
+class LoginView(LoginView):
+    """ログインページ"""
+    form_class = forms.LoginForm
+    template_name = "health/login.html"
+
+
+class LogoutView(LoginRequiredMixin, LogoutView):
+    """ログアウトページ"""
+    template_name = "health/login.html"
+
+
+class WeightList(LoginRequiredMixin, generic.ListView):
     template_name = 'health/weight_list.html'
     model = Weight
     ordering = '-date'
@@ -42,7 +55,7 @@ class WeightList(generic.ListView):
         return context
 
 
-class WeightCreate(generic.CreateView):
+class WeightCreate(LoginRequiredMixin, generic.CreateView):
     template_name = 'health/register.html'
     model = Weight
     form_class = WeightCreateForm
@@ -73,7 +86,7 @@ class WeightCreate(generic.CreateView):
         return super(WeightCreate, self).form_valid(form)
 
 
-class WeightUpdate(generic.UpdateView):
+class WeightUpdate(LoginRequiredMixin, generic.UpdateView):
     template_name = 'health/register.html'
     model = Weight
     form_class = WeightCreateForm
@@ -107,7 +120,7 @@ class WeightUpdate(generic.UpdateView):
         return redirect(self.get_success_url())
 
 
-class WeightDelete(generic.DeleteView):
+class WeightDelete(LoginRequiredMixin, generic.DeleteView):
     """支出削除"""
     template_name = 'health/delete.html'
     model = Weight
@@ -127,7 +140,7 @@ class WeightDelete(generic.DeleteView):
         return redirect(self.get_success_url())
 
 
-class MonthDashboard(generic.TemplateView):
+class MonthDashboard(LoginRequiredMixin, generic.TemplateView):
     """月間支出ダッシュボード"""
     template_name = 'health/month_dashboard.html'
 
@@ -194,7 +207,7 @@ class MonthDashboard(generic.TemplateView):
         context['gender'] = '男性' if detail.gender == 1 else '女性'
         context['age'] = detail.age
         context['leaving_work'] = round(97.8 + 13.9 * df['weight'][len(
-            df['weight']) - 1] + 176.8 * detail.gender + 2.29 * detail.height - 0.97 * detail.age + 6.13 * season_number,1)
+            df['weight']) - 1] + 176.8 * detail.gender + 2.29 * detail.height - 0.97 * detail.age + 6.13 * season_number, 1)
 
         # 日別の棒グラフの素材を渡す
         df_weight = pd.pivot_table(

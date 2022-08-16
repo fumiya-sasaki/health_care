@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import django_heroku
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -67,8 +68,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'health.my_context_processor.common',
             ],
-             'libraries': {
-                'health': 'health.templatetags.health' # 追記
+            'libraries': {
+                'health': 'health.templatetags.health'  # 追記
             }
         },
     },
@@ -131,5 +132,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'register.User'
 
-import django_heroku
+LOGIN_URL = 'health:login'
+LOGIN_REDIRECT_URL = "health:weight_list"
+LOGOUT_REDIRECT_URL = "health:login"
+
 django_heroku.settings(locals())

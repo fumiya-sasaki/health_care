@@ -58,7 +58,39 @@ main {
 header.nav {
   display: flex;
   flex-direction: row;
-  padding: 5% 0 0 5%;
+  padding: 5% 5% 0 5%;
+}
+
+@media screen and (max-width:700px) {
+  header.nav {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-nav {
+    padding-top: 10px;
+  }
+}
+
+.login-title {
+  font-size: 20px;
+  padding-bottom: 5%;
+}
+
+.login-container {
+  padding-left: 10px;
+}
+
+.form-control {
+  width: 20%;
+  margin: 5px 5px 5px 5px;
+}
+
+@media screen and (max-width:700px) {
+  .form-control {
+    width: 60%;
+    margin: 2% 2% 2% 2%;
+  }
 }
 
 .container {
@@ -226,6 +258,7 @@ a.header-title {
 }
 
 .table tr {
+  width: 100%;
   border-bottom: dotted 0.5px #432c02;
 }
 
@@ -237,7 +270,7 @@ a.header-title {
 .table td {
   text-align: center;
   width: 20%;
-  padding: 15px 0;
+  padding: 3% 0;
 }
 
 .form {
@@ -339,8 +372,22 @@ a.btn-danger {
 }
 
 .right {
-  width: 50%;
+  width: 40%;
   padding: 0 5%;
+}
+
+@media screen and (max-width:700px) {
+
+  .left {
+    width: 50%;
+    padding: 0 5%;
+  }
+
+  .right {
+    width: 50%;
+    padding: 0 5%;
+  }
+
 }
 
 /* --------------------------------

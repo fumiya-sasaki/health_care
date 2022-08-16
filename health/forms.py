@@ -1,3 +1,4 @@
+from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from .models import Weight
 from django.utils import timezone
@@ -29,6 +30,7 @@ class HealthSerchForm(forms.Form):
         widget=forms.Select(attrs={'class': 'form'})
     )
 
+
 class WeightCreateForm(forms.ModelForm):
     class Meta:
         model = Weight
@@ -42,3 +44,12 @@ class WeightCreateForm(forms.ModelForm):
             field.widget.attrs['class'] = 'form'
             field.widget.attrs['placeholder'] = field.label
             field.widget.attrs['autocomplete'] = 'off'
+
+
+class LoginForm(AuthenticationForm):
+    """ログインフォーム"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "form-control"
